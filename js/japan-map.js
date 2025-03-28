@@ -235,8 +235,8 @@ function addOkinawa(path, projection) {
     
     // 沖縄県のラベルを追加（他の都道府県と同じスタイル）
     japanMapSvg.append('text')
-        .attr('x', okinawaX)
-        .attr('y', okinawaY)
+        .attr('x', okinawaX+30)
+        .attr('y', okinawaY-20)
         .attr('text-anchor', 'middle')
         .attr('font-size', '8px')
         .attr('pointer-events', 'none')
