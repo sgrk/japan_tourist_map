@@ -63,6 +63,12 @@ async function loadJapanMap() {
             .on('mouseout', function(event, d) {
                 // ホバー解除時の処理
                 d3.select(this).classed('highlight', false);
+                
+                // 都道府県名のラベルを非表示
+                const prefName = d.properties.nam_ja;
+                const prefId = getPrefectureId(prefName);
+                const labelId = `label-${prefId}`;
+                d3.select(`#${labelId}`).classed('visible', false);
             })
             .on('click', function(event, d) {
                 // クリック時の処理
@@ -80,6 +86,8 @@ async function loadJapanMap() {
             .attr('text-anchor', 'middle')
             .attr('font-size', '8px')
             .attr('pointer-events', 'none')
+            .attr('class', 'prefecture-label')
+            .attr('id', d => `label-${getPrefectureId(d.properties.nam_ja)}`)
             .text(d => d.properties.nam_ja);
         
         // 青森県と福岡県の位置を保存
@@ -174,6 +182,9 @@ function addOkinawa(path, projection) {
             .on('mouseout', function(event, d) {
                 // ホバー解除時の処理
                 d3.select(this).classed('highlight', false);
+                
+                // 沖縄県のラベルを非表示
+                d3.select('#label-okinawa').classed('visible', false);
             })
             .on('click', function(event, d) {
                 // クリック時の処理
@@ -212,6 +223,9 @@ function addOkinawa(path, projection) {
             .on('mouseout', function(event, d) {
                 // ホバー解除時の処理
                 d3.select(this).classed('highlight', false);
+                
+                // 沖縄県のラベルを非表示
+                d3.select('#label-okinawa').classed('visible', false);
             })
             .on('click', function(event, d) {
                 // クリック時の処理
@@ -226,6 +240,8 @@ function addOkinawa(path, projection) {
         .attr('text-anchor', 'middle')
         .attr('font-size', '8px')
         .attr('pointer-events', 'none')
+        .attr('class', 'prefecture-label')
+        .attr('id', 'label-okinawa')
         .text('沖縄県');
     
     // prefectures選択に沖縄県を追加
@@ -243,7 +259,10 @@ function getPrefectureId(prefectureName) {
 function highlightPrefecture(element, prefectureName) {
     d3.select(element).classed('highlight', true);
     
-    // ツールチップなどの追加情報を表示することも可能
+    // 都道府県名のラベルを表示
+    const prefId = getPrefectureId(prefectureName);
+    const labelId = prefId === 'okinawa' ? 'label-okinawa' : `label-${prefId}`;
+    d3.select(`#${labelId}`).classed('visible', true);
 }
 
 // 都道府県を選択

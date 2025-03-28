@@ -185,6 +185,15 @@ button:disabled {
     fill: #bbb;
 }
 
+.prefecture-label {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.prefecture-label.visible {
+    opacity: 1;
+}
+
 .prefecture.visited-level-1 {
     fill: #d4e6f1;
 }
