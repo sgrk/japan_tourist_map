@@ -167,13 +167,13 @@ function addOkinawa(path, projection) {
                 polygon.map(ring => transformCoordinates(ring))
             );
         }
-        
+
         // 沖縄県のパスを追加
         okinawa = japanMapSvg.append('path')
             .datum(okinawaClone)
             .attr('d', path)
             .attr('class', 'prefecture')
-            .attr('id', 'okinawa')
+            .attr('id', 'okinawa-clone')
             .attr('data-name', '沖縄県')
             .on('mouseover', function(event, d) {
                 // ホバー時の処理
@@ -184,7 +184,7 @@ function addOkinawa(path, projection) {
                 d3.select(this).classed('highlight', false);
                 
                 // 沖縄県のラベルを非表示
-                d3.select('#label-okinawa').classed('visible', false);
+                d3.select('#label-okinawa-clone').classed('visible', false);
             })
             .on('click', function(event, d) {
                 // クリック時の処理
@@ -214,7 +214,7 @@ function addOkinawa(path, projection) {
         okinawa = japanMapSvg.append('path')
             .attr('d', d3.line()(okinawaShape))
             .attr('class', 'prefecture')
-            .attr('id', 'okinawa')
+            .attr('id', 'okinawa-clone')
             .attr('data-name', '沖縄県')
             .on('mouseover', function(event, d) {
                 // ホバー時の処理
@@ -225,7 +225,7 @@ function addOkinawa(path, projection) {
                 d3.select(this).classed('highlight', false);
                 
                 // 沖縄県のラベルを非表示
-                d3.select('#label-okinawa').classed('visible', false);
+                d3.select('#label-okinawa-clone').classed('visible', false);
             })
             .on('click', function(event, d) {
                 // クリック時の処理
@@ -241,7 +241,7 @@ function addOkinawa(path, projection) {
         .attr('font-size', '8px')
         .attr('pointer-events', 'none')
         .attr('class', 'prefecture-label')
-        .attr('id', 'label-okinawa')
+        .attr('id', 'label-okinawa-clone')
         .text('沖縄県');
     
     // prefectures選択に沖縄県を追加
@@ -257,11 +257,14 @@ function getPrefectureId(prefectureName) {
 
 // 都道府県をハイライト表示
 function highlightPrefecture(element, prefectureName) {
-    d3.select(element).classed('highlight', true);
-    
+    if(element === 'okinawa'){
+        d3.select('okinawa-clone').classed('highlight', true);
+    }else{
+        d3.select(element).classed('highlight', true);
+    }
     // 都道府県名のラベルを表示
     const prefId = getPrefectureId(prefectureName);
-    const labelId = prefId === 'okinawa' ? 'label-okinawa' : `label-${prefId}`;
+    const labelId = prefId === 'okinawa' ? 'label-okinawa-clone' : `label-${prefId}`;
     d3.select(`#${labelId}`).classed('visible', true);
 }
 
@@ -291,7 +294,7 @@ function updateMapColors() {
     });
     
     // 沖縄県の色も更新
-    const okinawaElement = document.getElementById('okinawa');
+    const okinawaElement = document.getElementById('okinawa-clone');
     if (okinawaElement) {
         const visitLevel = getPrefectureVisitLevel('沖縄県');
         d3.select(okinawaElement)
