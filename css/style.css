@@ -54,7 +54,7 @@ header h1 {
     max-width: 400px;
 }
 
-.location-hierarchy, .recommendations, .statistics {
+.location-hierarchy, .recommendations, .statistics, .random-recommendation {
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -127,6 +127,44 @@ button:disabled {
 
 .recommendation-item:hover {
     background-color: #eee;
+}
+
+/* Random recommendation styles */
+.random-place {
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    padding: 15px;
+    border-left: 4px solid #3498db;
+}
+
+.random-place h3 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.random-place .place-name {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: #333;
+    font-weight: bold;
+}
+
+.random-place .select-button {
+    background-color: #27ae60;
+    margin-bottom: 10px;
+}
+
+.random-place .select-button:hover {
+    background-color: #219653;
+}
+
+.random-place .shuffle-button {
+    background-color: #f39c12;
+}
+
+.random-place .shuffle-button:hover {
+    background-color: #d35400;
 }
 
 .statistics #stats {

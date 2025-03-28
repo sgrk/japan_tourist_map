@@ -14,8 +14,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // 統計を更新
     updateStatistics();
     
-    // 推奨を更新
-    updateRecommendations();
+    // ランダム推奨を更新
+    updateRandomRecommendation();
     
     // イベントリスナーを設定
     setupEventListeners();
@@ -116,6 +116,11 @@ function setupEventListeners() {
     // 履歴検索入力時
     document.getElementById('history-search').addEventListener('input', function() {
         updateHistoryList();
+    });
+    
+    // シャッフルボタンクリック時
+    document.getElementById('shuffle-recommendation').addEventListener('click', function() {
+        updateRandomRecommendation();
     });
 }
 
@@ -284,4 +289,207 @@ function updateMarkVisitedButton() {
     } else {
         markVisitedButton.textContent = '訪問済みにする';
     }
+}
+
+// 次の旅行先を推奨
+function getRecommendations() {
+    const recommendations = [];
+    const visitedPrefectures = new Set(Object.keys(visitedPlaces.prefectures));
+    
+    // 訪問率の低い都道府県を見つける
+    Object.keys(japanData).forEach(prefectureName => {
+        const visitLevel = getPrefectureVisitLevel(prefectureName);
+        
+        // 未訪問または訪問率が低い都道府県
+        if (visitLevel < 3) {
+            const prefecture = japanData[prefectureName];
+            
+            // 各地域を確認
+            Object.keys(prefecture.regions).forEach(regionName => {
+                const regionKey = `${prefectureName}-${regionName}`;
+                const region = prefecture.regions[regionName];
+                
+                // 未訪問の地域
+                if (!visitedPlaces.regions[regionKey] || visitedPlaces.regions[regionKey].count === 0) {
+                    // 推奨に追加
+                    recommendations.push({
+                        prefecture: prefectureName,
+                        region: regionName,
+                        level: 'region',
+                        density: visitLevel
+                    });
+                } else {
+                    // 各市区町村を確認
+                    Object.keys(region.cities).forEach(cityName => {
+                        const cityKey = `${prefectureName}-${regionName}-${cityName}`;
+                        const city = region.cities[cityName];
+                        
+                        // 未訪問の市区町村
+                        if (!visitedPlaces.cities[cityKey] || visitedPlaces.cities[cityKey].count === 0) {
+                            // 推奨に追加
+                            recommendations.push({
+                                prefecture: prefectureName,
+                                region: regionName,
+                                city: cityName,
+                                level: 'city',
+                                density: visitLevel
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    });
+    
+    // 密度（訪問率）の低い順にソート
+    recommendations.sort((a, b) => a.density - b.density);
+    
+    return recommendations.slice(0, 5); // 上位5件を返す
+}
+
+// 未訪問の都市をすべて取得
+function getAllUnvisitedCities() {
+    const unvisitedCities = [];
+    
+    // すべての都道府県をループ
+    Object.keys(japanData).forEach(prefectureName => {
+        const prefecture = japanData[prefectureName];
+        
+        // 各地域をループ
+        Object.keys(prefecture.regions).forEach(regionName => {
+            const regionKey = `${prefectureName}-${regionName}`;
+            const region = prefecture.regions[regionName];
+            
+            // 各市区町村をループ
+            Object.keys(region.cities).forEach(cityName => {
+                const cityKey = `${prefectureName}-${regionName}-${cityName}`;
+                
+                // 市区町村が未訪問または訪問数が0の場合は追加
+                if (!visitedPlaces.cities[cityKey] || visitedPlaces.cities[cityKey].count === 0) {
+                    unvisitedCities.push({
+                        prefecture: prefectureName,
+                        region: regionName,
+                        city: cityName,
+                        key: cityKey
+                    });
+                }
+            });
+        });
+    });
+    
+    return unvisitedCities;
+}
+
+// ランダムな未訪問の都市を取得
+function getRandomUnvisitedCity() {
+    const unvisitedCities = getAllUnvisitedCities();
+    
+    if (unvisitedCities.length === 0) {
+        return null;
+    }
+    
+    // ランダムに1つ選択
+    const randomIndex = Math.floor(Math.random() * unvisitedCities.length);
+    return unvisitedCities[randomIndex];
+}
+
+// ランダム推奨を更新
+function updateRandomRecommendation() {
+    const randomCity = getRandomUnvisitedCity();
+    const randomRecommendationContainer = document.getElementById('random-recommendation');
+    
+    if (!randomCity) {
+        randomRecommendationContainer.innerHTML = '<p>すべての場所を訪問済みです！おめでとうございます！</p>';
+        return;
+    }
+    
+    // ランダム推奨を表示
+    randomRecommendationContainer.innerHTML = `
+        <div class="random-place">
+            <h2>おすすめの旅行先</h2>
+            <p class="place-name">${randomCity.prefecture}の${randomCity.region}にある${randomCity.city}</p>
+            <button id="select-random-place" class="select-button">この場所を選択</button>
+            <button id="shuffle-recommendation" class="shuffle-button">シャッフル</button>
+        </div>
+    `;
+    
+    // 選択ボタンにイベントリスナーを追加
+    document.getElementById('select-random-place').addEventListener('click', function() {
+        // セレクトボックスを更新
+        const prefectureSelect = document.getElementById('prefecture-select');
+        prefectureSelect.value = randomCity.prefecture;
+        prefectureSelect.dispatchEvent(new Event('change'));
+        
+        setTimeout(() => {
+            const regionSelect = document.getElementById('region-select');
+            regionSelect.value = randomCity.region;
+            regionSelect.dispatchEvent(new Event('change'));
+            
+            setTimeout(() => {
+                const citySelect = document.getElementById('city-select');
+                citySelect.value = randomCity.city;
+                citySelect.dispatchEvent(new Event('change'));
+            }, 100);
+        }, 100);
+    });
+    
+    // シャッフルボタンにイベントリスナーを追加
+    document.getElementById('shuffle-recommendation').addEventListener('click', function() {
+        updateRandomRecommendation();
+    });
+}
+
+// 推奨リストを更新
+function updateRecommendations() {
+    const recommendations = getRecommendations();
+    const recommendationList = document.getElementById('recommendation-list');
+    
+    if (recommendations.length === 0) {
+        recommendationList.innerHTML = '<p>まだ推奨する場所がありません。訪問した場所を登録してください。</p>';
+        return;
+    }
+    
+    let html = '';
+    recommendations.forEach(rec => {
+        if (rec.level === 'region') {
+            html += `<div class="recommendation-item" data-prefecture="${rec.prefecture}" data-region="${rec.region}">
+                ${rec.prefecture}の${rec.region}を訪れましょう
+            </div>`;
+        } else {
+            html += `<div class="recommendation-item" data-prefecture="${rec.prefecture}" data-region="${rec.region}" data-city="${rec.city}">
+                ${rec.prefecture}の${rec.region}にある${rec.city}を訪れましょう
+            </div>`;
+        }
+    });
+    
+    recommendationList.innerHTML = html;
+    
+    // 推奨アイテムにクリックイベントを追加
+    const items = document.querySelectorAll('.recommendation-item');
+    items.forEach(item => {
+        item.addEventListener('click', function() {
+            const prefecture = this.dataset.prefecture;
+            const region = this.dataset.region;
+            const city = this.dataset.city;
+            
+            // セレクトボックスを更新
+            const prefectureSelect = document.getElementById('prefecture-select');
+            prefectureSelect.value = prefecture;
+            prefectureSelect.dispatchEvent(new Event('change'));
+            
+            setTimeout(() => {
+                const regionSelect = document.getElementById('region-select');
+                regionSelect.value = region;
+                regionSelect.dispatchEvent(new Event('change'));
+                
+                if (city) {
+                    setTimeout(() => {
+                        const citySelect = document.getElementById('city-select');
+                        citySelect.value = city;
+                        citySelect.dispatchEvent(new Event('change'));
+                    }, 100);
+                }
+            }, 100);
+        });
+    });
 }

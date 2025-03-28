@@ -1532,105 +1532,33 @@ function getVisitHistory(filterType = 'all', searchText = '') {
     // 検索テキストを小文字に変換
     searchText = searchText.toLowerCase();
     
-    // スポットの履歴を取得
-    if (filterType === 'all' || filterType === 'spot') {
-        Object.keys(visitedPlaces.spots).forEach(key => {
-            const parts = key.split('-');
-            const prefectureName = parts[0];
-            const regionName = parts[1];
-            const cityName = parts[2];
-            const spotName = parts[3];
-            
-            const displayName = `${prefectureName} > ${regionName} > ${cityName} > ${spotName}`;
-            
-            // 検索テキストでフィルタリング
-            if (searchText && !displayName.toLowerCase().includes(searchText)) {
-                return;
-            }
-            
-            history.push({
-                type: 'spot',
-                key: key,
-                displayName: displayName,
-                date: visitedPlaces.spots[key].date || '不明'
-            });
+    // スポットの履歴のみを取得
+    Object.keys(visitedPlaces.spots).forEach(key => {
+        const parts = key.split('-');
+        const prefectureName = parts[0];
+        const regionName = parts[1];
+        const cityName = parts[2];
+        const spotName = parts[3];
+        
+        const displayName = `${prefectureName} > ${regionName} > ${cityName} > ${spotName}`;
+        
+        // フィルタータイプでフィルタリング
+        if (filterType !== 'all' && filterType !== 'spot') {
+            return;
+        }
+        
+        // 検索テキストでフィルタリング
+        if (searchText && !displayName.toLowerCase().includes(searchText)) {
+            return;
+        }
+        
+        history.push({
+            type: 'spot',
+            key: key,
+            displayName: displayName,
+            date: visitedPlaces.spots[key].date || '不明'
         });
-    }
-    
-    // 市区町村の履歴を取得
-    if (filterType === 'all' || filterType === 'city') {
-        Object.keys(visitedPlaces.cities).forEach(key => {
-            // カウントが0の場合はスキップ
-            if (visitedPlaces.cities[key].count <= 0) return;
-            
-            const parts = key.split('-');
-            const prefectureName = parts[0];
-            const regionName = parts[1];
-            const cityName = parts[2];
-            
-            const displayName = `${prefectureName} > ${regionName} > ${cityName}`;
-            
-            // 検索テキストでフィルタリング
-            if (searchText && !displayName.toLowerCase().includes(searchText)) {
-                return;
-            }
-            
-            history.push({
-                type: 'city',
-                key: key,
-                displayName: displayName,
-                date: visitedPlaces.cities[key].date || '不明'
-            });
-        });
-    }
-    
-    // 地域の履歴を取得
-    if (filterType === 'all' || filterType === 'region') {
-        Object.keys(visitedPlaces.regions).forEach(key => {
-            // カウントが0の場合はスキップ
-            if (visitedPlaces.regions[key].count <= 0) return;
-            
-            const parts = key.split('-');
-            const prefectureName = parts[0];
-            const regionName = parts[1];
-            
-            const displayName = `${prefectureName} > ${regionName}`;
-            
-            // 検索テキストでフィルタリング
-            if (searchText && !displayName.toLowerCase().includes(searchText)) {
-                return;
-            }
-            
-            history.push({
-                type: 'region',
-                key: key,
-                displayName: displayName,
-                date: visitedPlaces.regions[key].date || '不明'
-            });
-        });
-    }
-    
-    // 都道府県の履歴を取得
-    if (filterType === 'all' || filterType === 'prefecture') {
-        Object.keys(visitedPlaces.prefectures).forEach(prefectureName => {
-            // カウントが0の場合はスキップ
-            if (visitedPlaces.prefectures[prefectureName].count <= 0) return;
-            
-            const displayName = prefectureName;
-            
-            // 検索テキストでフィルタリング
-            if (searchText && !displayName.toLowerCase().includes(searchText)) {
-                return;
-            }
-            
-            history.push({
-                type: 'prefecture',
-                key: prefectureName,
-                displayName: displayName,
-                date: visitedPlaces.prefectures[prefectureName].date || '不明'
-            });
-        });
-    }
+    });
     
     // 日付の新しい順にソート
     history.sort((a, b) => {

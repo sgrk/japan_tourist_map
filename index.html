@@ -38,11 +38,8 @@
                     <button id="mark-visited" disabled>訪問済みにする</button>
                 </div>
 
-                <div class="recommendations">
-                    <h2>おすすめの旅行先</h2>
-                    <div id="recommendation-list">
-                        <p>まだ推奨する場所がありません。訪問した場所を登録してください。</p>
-                    </div>
+                <div id="random-recommendation" class="random-recommendation">
+                    <!-- ランダム推奨がここに表示されます -->
                 </div>
                 
                 <div class="statistics">
@@ -65,9 +62,7 @@
                         <div class="history-filter">
                             <select id="history-filter">
                                 <option value="all">すべて</option>
-                                <option value="prefecture">都道府県</option>
-                                <option value="region">地域</option>
-                                <option value="city">市区町村</option>
+                                <option value="spot">観光スポット</option>
                             </select>
                             <input type="text" id="history-search" placeholder="検索...">
                         </div>
