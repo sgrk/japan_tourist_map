@@ -129,8 +129,8 @@ function addOkinawa(path, projection) {
         const dx = okinawaX - originalCentroid[0];
         const dy = okinawaY - originalCentroid[1];
         
-        // 拡大率を設定（4倍に拡大）
-        const scale = 2.0;
+        // 拡大率を設定（1.2倍に拡大）
+        const scale = 1.2;
         
         // 座標変換関数
         const transformCoordinates = coords => {
