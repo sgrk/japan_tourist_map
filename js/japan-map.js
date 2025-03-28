@@ -105,6 +105,9 @@ async function loadJapanMap() {
         // 初期の色を設定
         updateMapColors();
         
+        // 右上から左下への点線を追加
+        addDottedLine();
+        
     } catch (error) {
         console.error('地図データの読み込みに失敗しました:', error);
     }
@@ -312,7 +315,57 @@ function resizeMap() {
         const width = document.getElementById('japan-map').clientWidth;
         const height = document.getElementById('japan-map').clientHeight;
         japanMapSvg.attr('viewBox', `0 0 ${width} ${height}`);
+        
+        // 点線の位置も更新
+        updateDottedLine();
     }
+}
+
+// 点線の位置を更新する関数
+function updateDottedLine() {
+    const line = d3.select('#diagonal-dotted-line');
+    if (!line.empty()) {
+        const width = document.getElementById('japan-map').clientWidth;
+        const height = document.getElementById('japan-map').clientHeight;
+        
+        // 右上と左下の座標を更新
+        const startX = width * 0.9;
+        const startY = height * 0.1;
+        const endX = width * 0.1;
+        const endY = height * 0.9;
+        
+        // 線の座標を更新
+        line.attr('x1', startX)
+            .attr('y1', startY)
+            .attr('x2', endX)
+            .attr('y2', endY);
+    }
+}
+
+// 右上から左下への点線を追加する関数
+function addDottedLine() {
+    if (!japanMapSvg) return;
+    
+    // 地図のサイズを取得
+    const width = document.getElementById('japan-map').clientWidth;
+    const height = document.getElementById('japan-map').clientHeight;
+    
+    // 右上と左下の座標を設定
+    const startX = width * 0.4;  // 右側（90%位置）
+    const startY = height * 0.3; // 上側（10%位置）
+    const endX = width * 0.3;    // 左側（10%位置）
+    const endY = height * 0.4;   // 下側（90%位置）
+    
+    // 点線を追加
+    japanMapSvg.append('line')
+        .attr('x1', startX)
+        .attr('y1', startY)
+        .attr('x2', endX)
+        .attr('y2', endY)
+        .attr('stroke', '#333')  // 線の色
+        .attr('stroke-width', 2) // 線の太さ
+        .attr('stroke-dasharray', '5,5') // 点線のパターン（5px線、5px空白）
+        .attr('id', 'diagonal-dotted-line'); // ID for potential future reference
 }
 
 // ウィンドウリサイズイベントリスナー
