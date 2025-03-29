@@ -351,7 +351,7 @@ function addDottedLine() {
     const height = document.getElementById('japan-map').clientHeight;
     
     // 右上と左下の座標を設定
-    const startX = width * 0.45;  // 右側（90%位置）
+    const startX = width * 0.4;  // 右側（90%位置）
     const startY = height * 0.25; // 上側（10%位置）
     const endX = width * 0.2;    // 左側（10%位置）
     const endY = height * 0.45;   // 下側（90%位置）
